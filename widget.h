@@ -80,10 +80,6 @@ private slots:
 	void on_PBytsave_clicked();
 	void on_CByt1_stateChanged(int arg1);
 
-
-
-
-
 private:
 	Ui::Widget *ui;
 };

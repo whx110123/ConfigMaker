@@ -70,19 +70,21 @@ void Widget::createItem()
 	QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
 	if(curItem==NULL)
 		return;
-	int tmp = curItem->childCount()+1;
-	for (int i = 1;i < curItem->childCount();i++)
+
+	uint tmp = 1;
+	if(curItem->childCount() > 0 && curItem->child(0)->text(0).toUInt() < 2)
 	{
-		if(curItem->child(i)->text(0).toUInt() - curItem->child(i-1)->text(0).toUInt() != 1)
+		tmp = curItem->child(curItem->childCount()-1)->text(0).toUInt() + 1;
+		for (int i = 1;i < curItem->childCount();i++)
 		{
-			tmp = curItem->child(i-1)->text(0).toUInt() + 1;
-			break;
+			if(curItem->child(i)->text(0).toUInt() - curItem->child(i-1)->text(0).toUInt() != 1)
+			{
+				tmp = curItem->child(i-1)->text(0).toUInt() + 1;
+				break;
+			}
 		}
 	}
-	if(curItem->childCount() > 0 && curItem->child(0)->text(0).toUInt() > 1)
-	{
-		tmp = 1;
-	}
+
 	QString strtmp = QString("%1").arg(QString::number(tmp),2,QLatin1Char('0'));
 	if(curItem->text(0).contains(tr("遥测")))
 	{
