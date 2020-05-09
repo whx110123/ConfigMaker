@@ -22,6 +22,10 @@ public:
 
 private:
 	void initconfig();
+	QString createtxt();
+	QString createcfg();
+	int groupsort();
+	QString checkerror();
 	QAction *act1;
 	QAction *act2;
 	QAction *act3;
@@ -30,12 +34,18 @@ private:
 	int ymnum;
 	int yknum;
 	int ytnum;
+	char grouptype[100];
 	baseconfig *base;
 	QMap<QString , class ycconfig> ycmap;
 	QMap<QString , class yxconfig> yxmap;
 	QMap<QString , class ymconfig> ymmap;
 	QMap<QString , class ykconfig> ykmap;
 	QMap<QString , class ytconfig> ytmap;
+
+	QString filetxtdir;
+	QString filecfgdir;
+	QString filename;
+	QString protocolname;
 
 private slots:
 	void popMenu(const QPoint&);
@@ -79,6 +89,11 @@ private slots:
 
 	void on_PBytsave_clicked();
 	void on_CByt1_stateChanged(int arg1);
+
+	void on_PB_selectfile_clicked();
+
+
+	void on_PB_out_clicked();
 
 private:
 	Ui::Widget *ui;

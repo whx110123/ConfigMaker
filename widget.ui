@@ -117,7 +117,7 @@
         <enum>QFrame::Box</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>6</number>
        </property>
        <widget class="QWidget" name="Basewidget">
         <widget class="QPushButton" name="PBsave">
@@ -1727,7 +1727,10 @@
           </rect>
          </property>
          <property name="text">
-          <string>说明：按照需求填写，只需配置一次的值在基本配置里面填写，最后生成文件即可</string>
+          <string>说明：按照需求填写，只需配置一次的值在基本配置里面填写，最后生成文件即可。
+
+
+选择文件时只需选择txt，导出文件时会导出相同文件名的cfg文件</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -1740,7 +1743,7 @@
    </widget>
    <widget class="QWidget" name="page_2"/>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="PB_out">
    <property name="geometry">
     <rect>
      <x>690</x>
@@ -1777,7 +1780,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="CB_protocol">
       <item>
        <property name="text">
         <string>modbus装置规约</string>
@@ -1805,10 +1808,14 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="LE_filedir">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="PB_selectfile">
       <property name="maximumSize">
        <size>
         <width>40</width>

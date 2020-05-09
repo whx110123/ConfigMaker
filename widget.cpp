@@ -1,6 +1,7 @@
 ﻿#include "widget.h"
 #include "ui_widget.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
 
@@ -38,10 +39,205 @@ void Widget::initconfig()
 	ymnum = 0;
 	yknum = 0;
 	ytnum = 0;
+	memset(grouptype,0,sizeof(grouptype));
 	base = new baseconfig();
 }
 
-void Widget::popMenu(const QPoint &point)
+QString Widget::createtxt()
+{
+	QString text;
+
+	text.append("[名称]\n");
+	text.append(filename + "\n");
+	text.append("[类型]\n");
+	text.append("保护测控\n");
+
+	int groupNo = 0;
+	QMap<QString, ycconfig>::const_iterator ycNo = ycmap.constBegin();
+	QMap<QString, yxconfig>::const_iterator yxNo = yxmap.constBegin();
+	QMap<QString, ymconfig>::const_iterator ymNo = ymmap.constBegin();
+
+	int groupnum = groupsort();
+	for (int i = 0;i<groupnum*3;i++)
+	{
+		switch (grouptype[i])
+		{
+		case 1:
+			groupNo++;
+			text.append("\n[遥测]\n");
+			for (int i = 0;i < ycNo.value().textlst.length();i++)
+			{
+				text.append(QString::number(i+1)+","+QString::number(groupNo)+ "," +QString::number(i+1)+"," + ycNo.value().textlst.at(i)+",,5,,\n");
+			}
+			ycNo++;
+			break;
+		case 2:
+			groupNo++;
+			text.append("\n[遥信]\n");
+			for (int i = 0;i < yxNo.value().textlst.length();i++)
+			{
+				text.append(QString::number(i+1)+","+QString::number(groupNo)+ "," +QString::number(i+1)+"," + yxNo.value().textlst.at(i)+",,5,,\n");
+			}
+			yxNo++;
+			break;
+		case 3:
+			groupNo++;
+			text.append("\n[遥脉]\n");
+			for (int i = 0;i < ymNo.value().textlst.length();i++)
+			{
+				text.append(QString::number(i+1)+","+QString::number(groupNo)+ "," +QString::number(i+1)+"," + ymNo.value().textlst.at(i)+",,5,,\n");
+			}
+			ymNo++;
+			break;
+		default:
+			break;
+		}
+	}
+	if(yknum >0)
+	{
+		text.append("\n[遥控]\n");
+		QMap<QString, ykconfig>::const_iterator ykNo = ykmap.constBegin();
+		int i = 0;
+		while (ykNo != ykmap.constEnd())
+		{
+			text.append(QString::number(i+1)+",60," +QString::number(i+1)+"," + ykNo.value().textlst.at(0)+",,5,,\n");
+			ykNo++;
+			i++;
+		}
+	}
+	if(ytnum >0)
+	{
+		text.append("\n[遥调]\n");
+		QMap<QString, ytconfig>::const_iterator ytNo = ytmap.constBegin();
+		int i = 0;
+		while (ytNo != ytmap.constEnd())
+		{
+			text.append(QString::number(i+1)+",70," +QString::number(i+1)+"," + ytNo.value().textlst.at(0)+",,5,,\n");
+			ytNo++;
+			i++;
+		}
+	}
+	text.append("\n[特殊遥信]\n");
+	text.append("1,255,1,网络状态A,,5,通,断\n");
+	text.append("2,255,2,网络状态B,,5,通,断\n");
+	return text;
+}
+
+QString Widget::createcfg()
+{
+	QString text;
+	text.append("[属性]\n");
+	text.append("名称=" +filename + "\n");
+	text.append("默认规约="+protocolname +"\n");
+	text.append("版本号=v1.00\n");
+	text.append("可变选项组数=1\n");
+	text.append("[数据分类]\n");
+	text.append("数目=18\n");
+	text.append("数据名称=遥测,遥信,遥脉,遥控,模拟量,动作元件,运行告警,装置自检,硬压板,软压板,故障信息,扰动数据说明,定值,定值区号,特殊遥信,保护测量,装置参数,档位\n");
+	text.append("遥测=YC\n");
+	text.append("遥信=YX\n");
+	text.append("遥脉=YM\n");
+	text.append("遥控=YK\n");
+	text.append("模拟量=YC\n");
+	text.append("动作元件=YX\n");
+	text.append("运行告警=YX\n");
+	text.append("装置自检=YX\n");
+	text.append("硬压板=YX\n");
+	text.append("软压板=YXYK\n");
+	text.append("故障信息=OTHER\n");
+	text.append("扰动数据说明=OTHER\n");
+	text.append("定值=OTHER\n");
+	text.append("定值区号=OTHER\n");
+	text.append("特殊遥信=YX\n");
+	text.append("保护测量=YC\n");
+	text.append("装置参数=OTHER\n");
+	text.append("档位=YP\n");
+	text.append("[相关信息]\n");
+	text.append("数目=0\n");
+	text.append("[可变选项1]\n");
+	text.append("名称=可变选项1\n");
+	text.append("维数=1\n");
+	int num = 0;
+	text.append("数目="+QString::number(num)+"\n");
+	int No = 1;
+
+	text.append("选项"+QString::number(No++)+"召唤分组数,INT,"+QString::number(groupsort())+"(0-65535)\n");
+
+
+	return text;
+}
+
+int Widget::groupsort()
+{
+	memset(grouptype,0,sizeof(grouptype));
+	for (int i = 0;i <ycnum;i++)
+	{
+		grouptype[i*3] = 1;
+	}
+	for (int i = 0;i <yxnum;i++)
+	{
+		grouptype[i*3+1] = 2;
+	}
+	for (int i = 0;i <ymnum;i++)
+	{
+		grouptype[i*3+2] = 3;
+	}
+
+	int max = ycnum;
+	max = yxnum > max ? yxnum : max;
+	max = ymnum > max ? yxnum : max;
+	return max;
+}
+
+QString Widget::checkerror()
+{
+	QString text;
+	for (QMap<QString, ycconfig>::const_iterator ycNo = ycmap.constBegin();ycNo !=ycmap.constEnd();ycNo++)
+	{
+		if(ycNo.value().textlst.isEmpty())
+		{
+			text.append("出错，遥测"+ycNo.key()+"描述为空");
+			return text;
+		}
+	}
+	for (QMap<QString, yxconfig>::const_iterator yxNo = yxmap.constBegin();yxNo !=yxmap.constEnd();yxNo++)
+	{
+		if(yxNo.value().textlst.isEmpty())
+		{
+			text.append("出错，遥信"+yxNo.key()+"描述为空");
+			return text;
+		}
+	}
+	for (QMap<QString, ymconfig>::const_iterator ymNo = ymmap.constBegin();ymNo !=ymmap.constEnd();ymNo++)
+	{
+		if(ymNo.value().textlst.isEmpty())
+		{
+			text.append("出错，遥脉"+ymNo.key()+"描述为空");
+			return text;
+		}
+	}
+	for (QMap<QString, ykconfig>::const_iterator ykNo = ykmap.constBegin();ykNo !=ykmap.constEnd();ykNo++)
+	{
+		if(ykNo.value().textlst.isEmpty())
+		{
+			text.append("出错，遥控"+ykNo.key()+"描述为空");
+			return text;
+		}
+	}
+	for (QMap<QString, ytconfig>::const_iterator ytNo = ytmap.constBegin();ytNo !=ytmap.constEnd();ytNo++)
+	{
+		if(ytNo.value().textlst.isEmpty())
+		{
+			text.append("出错，遥调"+ytNo.key()+"描述为空");
+			return text;
+		}
+	}
+	return text;
+}
+
+
+
+void Widget::popMenu(const QPoint &)
 {
 	QMenu menu(ui->treeWidget);
 	QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
@@ -610,3 +806,61 @@ void Widget::on_CByt1_stateChanged(int arg1)
 	ui->LEyt1->setText(QString::number(ss,arg1?16:10));
 }
 
+
+void Widget::on_PB_selectfile_clicked()
+{
+	QString filedir = QFileDialog::getSaveFileName(this,tr("保存对话框"),"",tr("文本文件(*txt)"));
+	if(filedir.isEmpty())
+	{
+		return;
+	}
+	filedir.remove(".txt");
+	filename = filedir.split('/').last();
+	filetxtdir = filedir + ".txt";
+	filecfgdir = filedir + ".cfg";
+	ui->LE_filedir->setText(filetxtdir);
+}
+
+
+void Widget::on_PB_out_clicked()
+{
+	QString err = checkerror();
+	if(err.contains("出错"))
+	{
+		QMessageBox::warning(this,tr("警告对话框"),err+"   ");
+		return;
+	}
+	protocolname = ui->CB_protocol->currentText();
+	QString fileDir = ui->LE_filedir->text();
+	if(fileDir.isEmpty())
+	{
+		QMessageBox::warning(this,tr("警告对话框"),tr("请先选择文件   "));
+		return;
+	}
+
+	QFile filetxt(filetxtdir);
+	if(!filetxt.open(QIODevice::WriteOnly|QIODevice::Text))
+	{
+		QMessageBox::warning(this,tr("警告对话框"),tr("文件打开失败    "));
+		return;
+	}
+	QTextStream outtxt(&filetxt);
+	outtxt.setCodec("GB18030");
+	QString text = createtxt();
+	outtxt << text ;
+	filetxt.close();
+
+	QFile filecfg(filecfgdir);
+	if(!filecfg.open(QIODevice::WriteOnly|QIODevice::Text))
+	{
+		QMessageBox::warning(this,tr("警告对话框"),tr("文件打开失败    "));
+		return;
+	}
+	QTextStream outcfg(&filecfg);
+	outcfg.setCodec("GB18030");
+	text = createcfg();
+	outcfg << text ;
+	filecfg.close();
+
+	QMessageBox::information(this,tr("提示对话框"),tr("已完成       "));
+}
