@@ -49,7 +49,7 @@ QString Widget::createtxt()
 
 	text.append("[名称]\n");
 	text.append(filename + "\n");
-	text.append("[类型]\n");
+	text.append("\n[类型]\n");
 	text.append("保护测控\n");
 
 	int groupNo = 0;
@@ -132,12 +132,13 @@ QString Widget::createcfg()
 	text.append("版本号=v1.00\n");
 	text.append("可变选项组数=1\n");
 	text.append("[数据分类]\n");
-	text.append("数目=18\n");
-	text.append("数据名称=遥测,遥信,遥脉,遥控,模拟量,动作元件,运行告警,装置自检,硬压板,软压板,故障信息,扰动数据说明,定值,定值区号,特殊遥信,保护测量,装置参数,档位\n");
+	text.append("数目=19\n");
+	text.append("数据名称=遥测,遥信,遥脉,遥控,遥调,模拟量,动作元件,运行告警,装置自检,硬压板,软压板,故障信息,扰动数据说明,定值,定值区号,特殊遥信,保护测量,装置参数,档位\n");
 	text.append("遥测=YC\n");
 	text.append("遥信=YX\n");
 	text.append("遥脉=YM\n");
 	text.append("遥控=YK\n");
+	text.append("遥调=YT\n");
 	text.append("模拟量=YC\n");
 	text.append("动作元件=YX\n");
 	text.append("运行告警=YX\n");
@@ -157,11 +158,102 @@ QString Widget::createcfg()
 	text.append("[可变选项1]\n");
 	text.append("名称=可变选项1\n");
 	text.append("维数=1\n");
-	int num = 0;
+	int groups = groupsort();
+	int num = 4 + groups * 11;
+	if(yknum)
+		num += 4+yknum*4;
+	if(ytnum)
+		num += 1+ytnum;
 	text.append("数目="+QString::number(num)+"\n");
 	int No = 1;
+	if(yknum)
+	{
+		text.append("选项"+QString::number(No++)+"=遥控功能码,INT,"+QString::number(base->ykcode)+"(0-65535)\n");
+		text.append("选项"+QString::number(No++)+"=遥控预置,INT,"+QString::number(base->ykselect)+"(0-65535)\n");
+		text.append("选项"+QString::number(No++)+"=控合命令字,INT,"+QString::number(base->ykclose)+"(0-65535)\n");
+		text.append("选项"+QString::number(No++)+"=控分命令字,INT,"+QString::number(base->ykopen)+"(0-65535)\n");
+		QMap<QString, ykconfig>::const_iterator ykNo = ykmap.constBegin();
+		int i = 0;
+		while (ykNo != ykmap.constEnd())
+		{
+			text.append("选项"+QString::number(No++)+"=遥控"+QString::number(i+1)+"控合预置地址,INT,"+QString::number(ykNo.value().ykcloseaddrsel)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥控"+QString::number(i+1)+"控合地址,INT,"+QString::number(ykNo.value().ykcloseaddr)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥控"+QString::number(i+1)+"控分预置地址,INT,"+QString::number(ykNo.value().ykopenaddrsel)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥控"+QString::number(i+1)+"控分地址,INT,"+QString::number(ykNo.value().ykopenaddr)+"(0-65535)\n");
+			ykNo++;
+			i++;
+		}
+	}
+	if(ytnum)
+	{
+		text.append("选项"+QString::number(No++)+"=遥调功能码,INT,"+QString::number(base->ytcode)+"(0-65535)\n");
+		QMap<QString, ytconfig>::const_iterator ytNo = ytmap.constBegin();
+		int i = 0;
+		while (ytNo != ytmap.constEnd())
+		{
+			text.append("选项"+QString::number(No++)+"=遥调"+QString::number(i+1)+"设置地址,INT,"+QString::number(ytNo.value().ytaddr)+"(0-65535)\n");
+			ytNo++;
+			i++;
+		}
+	}
+	text.append("选项"+QString::number(No++)+"=召唤分组数,INT,"+QString::number(groups)+"(0-65535)\n");
+	int index = 0;
+	QMap<QString, ycconfig>::const_iterator ycNo = ycmap.constBegin();
+	QMap<QString, yxconfig>::const_iterator yxNo = yxmap.constBegin();
+	QMap<QString, ymconfig>::const_iterator ymNo = ymmap.constBegin();
+	while (index < groups * 3)
+	{
+		if(grouptype[index++])
+		{
+			text.append("选项"+QString::number(No++)+"=遥测寄存器个数,INT,"+QString::number(ycNo.value().ycnum)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥测四字节,INT,"+QString::number(ycNo.value().yctype)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥测功能码,INT,"+QString::number(ycNo.value().yccode)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥测起始地址,INT,"+QString::number(ycNo.value().ycaddr)+"(0-65535)\n");
+			ycNo++;
+		}
+		else
+		{
+			text.append("选项"+QString::number(No++)+"=遥测寄存器个数,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥测四字节,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥测功能码,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥测起始地址,INT,0(0-65535)\n");
+		}
 
-	text.append("选项"+QString::number(No++)+"召唤分组数,INT,"+QString::number(groupsort())+"(0-65535)\n");
+		if(grouptype[index++])
+		{
+			text.append("选项"+QString::number(No++)+"=遥信寄存器个数,INT,"+QString::number(yxNo.value().yxnum)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥信寄存器BIT长度,INT,"+QString::number(yxNo.value().yxtype)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥信功能码,INT,"+QString::number(yxNo.value().yxcode)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥信起始地址,INT,"+QString::number(yxNo.value().yxaddr)+"(0-65535)\n");
+			yxNo++;
+		}
+		else
+		{
+			text.append("选项"+QString::number(No++)+"=遥信寄存器个数,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥信寄存器BIT长度,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥信功能码,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥信起始地址,INT,0(0-65535)\n");
+		}
+
+		if(grouptype[index++])
+		{
+			text.append("选项"+QString::number(No++)+"=遥脉寄存器个数,INT,"+QString::number(ymNo.value().ymnum)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥脉功能码,INT,"+QString::number(ymNo.value().ymcode)+"(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥脉起始地址,INT,"+QString::number(ymNo.value().ymaddr)+"(0-65535)\n");
+			ymNo++;
+		}
+		else
+		{
+			text.append("选项"+QString::number(No++)+"=遥脉寄存器个数,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥脉功能码,INT,0(0-65535)\n");
+			text.append("选项"+QString::number(No++)+"=遥脉起始地址,INT,0(0-65535)\n");
+		}
+
+	}
+
+	text.append("选项"+QString::number(No++)+"=遥脉低字节寄存器在前,INT,"+QString::number(base->ymseq)+"(0-65535)\n");
+	text.append("选项"+QString::number(No++)+"=遥脉BCD码格式,INT,"+QString::number(base->ymbcd)+"(0-65535)\n");
+	text.append("选项"+QString::number(No++)+"=从机应答报文读取数据长度字节个数,INT,"+QString::number(base->datalen)+"(1-2)\n");
 
 
 	return text;
@@ -192,6 +284,11 @@ int Widget::groupsort()
 QString Widget::checkerror()
 {
 	QString text;
+	if(groupsort() == 0)
+	{
+		text.append("出错，遥测、遥信、遥脉均无数据");
+		return text;
+	}
 	for (QMap<QString, ycconfig>::const_iterator ycNo = ycmap.constBegin();ycNo !=ycmap.constEnd();ycNo++)
 	{
 		if(ycNo.value().textlst.isEmpty())
@@ -386,7 +483,7 @@ void Widget::renameItem()
 		if(parent->text(0).contains(tr("遥测")))
 		{
 			ycmap.insert(newname,ycmap[curItem->text(0)]);
-			ycmap.erase(ycmap.find(curItem->text(0)));			
+			ycmap.erase(ycmap.find(curItem->text(0)));
 		}
 		else if(parent->text(0).contains(tr("遥信")))
 		{
@@ -512,15 +609,59 @@ void Widget::on_treeWidget_itemSelectionChanged()
 	}
 	else
 	{
-		ui->stackconfig->setCurrentIndex(0);
-		ui->LE1->setText(QString::number(base->ykcode,ui->CB1->isChecked()?16:10));
-		ui->LE2->setText(QString::number(base->ykselect,ui->CB2->isChecked()?16:10));
-		ui->LE3->setText(QString::number(base->ykclose,ui->CB3->isChecked()?16:10));
-		ui->LE4->setText(QString::number(base->ykopen,ui->CB4->isChecked()?16:10));
-		ui->LE5->setText(QString::number(base->ytcode,ui->CB5->isChecked()?16:10));
-		ui->LE6->setText(QString::number(base->ymseq,ui->CB6->isChecked()?16:10));
-		ui->LE7->setText(QString::number(base->ymbcd,ui->CB7->isChecked()?16:10));
-		ui->LE8->setText(QString::number(base->datalen,ui->CB8->isChecked()?16:10));
+		if(curItem->text(0).contains(tr("遥控")))
+		{
+
+			ui->stackconfig->setCurrentIndex(6);
+			QString text;
+			for (QMap<QString, ykconfig>::const_iterator ykNo = ykmap.constBegin();ykNo !=ykmap.constEnd();ykNo++)
+			{
+				if(ykNo.value().textlst.isEmpty())
+				{
+					text.append("\n");
+				}
+				else
+				{
+					text.append(ykNo.value().textlst.at(0) + "\n");
+				}
+			}
+			ui->Labelyksnum->setText(QString::number(yknum));
+			ui->TEyks->setPlainText(text);
+		}
+		else if(curItem->text(0).contains(tr("遥调")))
+		{
+			ui->stackconfig->setCurrentIndex(7);
+			QString text;
+			for (QMap<QString, ytconfig>::const_iterator ytNo = ytmap.constBegin();ytNo !=ytmap.constEnd();ytNo++)
+			{
+				if(ytNo.value().textlst.isEmpty())
+				{
+					text.append("\n");
+				}
+				else
+				{
+					text.append(ytNo.value().textlst.at(0) + "\n");
+				}
+			}
+			ui->Labelytsnum->setText(QString::number(ytnum));
+			ui->TEyts->setPlainText(text);
+		}
+		else if(curItem->text(0).contains(tr("基本配置")))
+		{
+			ui->stackconfig->setCurrentIndex(0);
+			ui->LE1->setText(QString::number(base->ykcode,ui->CB1->isChecked()?16:10));
+			ui->LE2->setText(QString::number(base->ykselect,ui->CB2->isChecked()?16:10));
+			ui->LE3->setText(QString::number(base->ykclose,ui->CB3->isChecked()?16:10));
+			ui->LE4->setText(QString::number(base->ykopen,ui->CB4->isChecked()?16:10));
+			ui->LE5->setText(QString::number(base->ytcode,ui->CB5->isChecked()?16:10));
+			ui->LE6->setText(QString::number(base->ymseq,ui->CB6->isChecked()?16:10));
+			ui->LE7->setText(QString::number(base->ymbcd,ui->CB7->isChecked()?16:10));
+			ui->LE8->setText(QString::number(base->datalen,ui->CB8->isChecked()?16:10));
+		}
+		else
+		{
+			ui->stackconfig->setCurrentIndex(ui->stackconfig->count()-1);
+		}
 	}
 }
 
@@ -598,11 +739,11 @@ void Widget::on_PBycsave_clicked()
 	else
 	{
 		ycmap[key].textlst = text.split('\n');
-		ycmap[key].textlst.removeAll("");
 		for (int i = 0;i < ycmap[key].textlst.length();i++)
 		{
 			ycmap[key].textlst.replace(i,ycmap[key].textlst.value(i).trimmed());
 		}
+		ycmap[key].textlst.removeAll("");
 	}
 	ui->Labelycnum->setText(QString::number(ycmap[key].textlst.length()));
 	ycmap[key].ycnum = ui->LEyc1->text().toUShort(0,ui->CByc1->isChecked()?16:10);
@@ -649,11 +790,11 @@ void Widget::on_PByxsave_clicked()
 	else
 	{
 		yxmap[key].textlst = text.split('\n');
-		yxmap[key].textlst.removeAll("");
 		for (int i = 0;i < yxmap[key].textlst.length();i++)
 		{
 			yxmap[key].textlst.replace(i,yxmap[key].textlst.value(i).trimmed());
 		}
+		yxmap[key].textlst.removeAll("");
 	}
 	ui->Labelyxnum->setText(QString::number(yxmap[key].textlst.length()));
 	yxmap[key].yxnum = ui->LEyx1->text().toUShort(0,ui->CByx1->isChecked()?16:10);
@@ -700,11 +841,11 @@ void Widget::on_PBymsave_clicked()
 	else
 	{
 		ymmap[key].textlst = text.split('\n');
-		ymmap[key].textlst.removeAll("");
 		for (int i = 0;i < ymmap[key].textlst.length();i++)
 		{
 			ymmap[key].textlst.replace(i,ymmap[key].textlst.value(i).trimmed());
 		}
+		ymmap[key].textlst.removeAll("");
 	}
 	ui->Labelymnum->setText(QString::number(ymmap[key].textlst.length()));
 	ymmap[key].ymnum = ui->LEym1->text().toUShort(0,ui->CBym1->isChecked()?16:10);
@@ -863,4 +1004,131 @@ void Widget::on_PB_out_clicked()
 	filecfg.close();
 
 	QMessageBox::information(this,tr("提示对话框"),tr("已完成       "));
+}
+
+void Widget::on_PBykssave_clicked()
+{
+	if(yknum > 0)
+	{
+		QMessageBox::warning(this,tr("警告对话框"),tr("遥控组下的遥控点先删除    "));
+		return;
+	}
+	QString text = ui->TEyks->toPlainText().trimmed();
+	if(text.isEmpty())
+	{
+		return;
+	}
+	else
+	{
+		QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
+		if(curItem==NULL)
+			return;
+		QStringList textlst = text.split('\n');
+		for (int i = 0;i < textlst.length();i++)
+		{
+			textlst.replace(i,textlst.value(i).trimmed());
+		}
+		textlst.removeAll("");
+
+		for (int i = 0;i < textlst.length();i++)
+		{
+			++yknum;
+			ykconfig *cfg = new ykconfig;
+			cfg->textlst << textlst.value(i);
+			QString strtmp = QString("%1").arg(QString::number(yknum),2,QLatin1Char('0'));
+			ykmap.insert(strtmp,*cfg);
+			delete cfg;
+			QTreeWidgetItem* newItem = new QTreeWidgetItem(curItem,QStringList() << strtmp);
+			newItem->setFlags(newItem->flags() | Qt::ItemNeverHasChildren);
+		}
+		curItem->setExpanded(true);
+		on_treeWidget_itemSelectionChanged();
+	}
+
+}
+
+void Widget::on_PBytssave_clicked()
+{
+	if(ytnum > 0)
+	{
+		QMessageBox::warning(this,tr("警告对话框"),tr("遥调组下的遥调点先删除    "));
+		return;
+	}
+	QString text = ui->TEyts->toPlainText().trimmed();
+	if(text.isEmpty())
+	{
+		return;
+	}
+	else
+	{
+		QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
+		if(curItem==NULL)
+			return;
+		QStringList textlst = text.split('\n');
+		for (int i = 0;i < textlst.length();i++)
+		{
+			textlst.replace(i,textlst.value(i).trimmed());
+		}
+		textlst.removeAll("");
+
+		for (int i = 0;i < textlst.length();i++)
+		{
+			++ytnum;
+			ytconfig *cfg = new ytconfig;
+			cfg->textlst << textlst.value(i);
+			QString strtmp = QString("%1").arg(QString::number(ytnum),2,QLatin1Char('0'));
+			ytmap.insert(strtmp,*cfg);
+			delete cfg;
+			QTreeWidgetItem* newItem = new QTreeWidgetItem(curItem,QStringList() << strtmp);
+			newItem->setFlags(newItem->flags() | Qt::ItemNeverHasChildren);
+		}
+		curItem->setExpanded(true);
+		on_treeWidget_itemSelectionChanged();
+	}
+}
+
+void Widget::keyPressEvent(QKeyEvent *event)
+{
+
+	if ( event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+	{
+		QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
+		if(curItem==NULL)
+			return;
+		if(curItem->flags() & Qt::ItemNeverHasChildren)
+		{
+			QTreeWidgetItem *parent = curItem->parent();
+			if(parent==NULL)
+				return;
+			if(parent->text(0).contains(tr("遥测")))
+			{
+				on_PBycsave_clicked();
+			}
+			else if(parent->text(0).contains(tr("遥信")))
+			{
+				on_PByxsave_clicked();
+			}
+			else if(parent->text(0).contains(tr("遥脉")))
+			{
+				on_PBymsave_clicked();
+			}
+			else if(parent->text(0).contains(tr("遥控")))
+			{
+				on_PByksave_clicked();
+			}
+			else if(parent->text(0).contains(tr("遥调")))
+			{
+				on_PBytsave_clicked();
+			}
+		}
+		else
+		{
+			if(curItem->text(0).contains(tr("基本配置")))
+			{
+				on_PBsave_clicked();
+			}
+
+		}
+
+	}
 }

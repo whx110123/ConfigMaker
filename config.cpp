@@ -9,7 +9,7 @@ baseconfig::baseconfig()
 {
 
 	ykcode = 5;
-	ykselect = 1;
+	ykselect = 0;
 	ykclose = 0xffff;
 	ykopen = 0;
 	ytcode = 6;
