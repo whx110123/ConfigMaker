@@ -23,15 +23,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 RESOURCES           += other/main.qrc
 SOURCES += \
-    config.cpp \
+    globalfunc.cpp \
     main.cpp \
+    modbusfrm.cpp \
     widget.cpp
 
 HEADERS += \
-    config.h \
+    globalfunc.h \
+    modbusfrm.h \
     widget.h
 
 FORMS += \
+    modbusfrm.ui \
     widget.ui
 
 # Default rules for deployment.
