@@ -82,8 +82,9 @@ public:
 	void initconfig();								//初始化
 	void groupscla();								//计算分组数
 	QString checkerror();							//导出前检查错误
-	QString groupsort();							//分组排序
-
+//	QString groupsort();							//分组排序
+	void groupucharsort();
+	uchar groupuchar[255];
 
 private slots:
 	void popMenu(const QPoint&);					//响应右键

@@ -120,22 +120,52 @@ QString ModbusFrm::checkerror()
 	return text;
 }
 
-QString ModbusFrm::groupsort()
+//QString ModbusFrm::groupsort()
+//{
+//	modbusItemData itemdata = ui->treeWidget->topLevelItem(0)->data(0,Qt::UserRole+1).value<modbusItemData>();
+//	int groupnum = itemdata.groupnum;
+//	QString sort = QString("%1").arg(QString::number(0),groupnum*3,QLatin1Char('0'));
+//	for (int i =0;i <3;i++)
+//	{
+//		int tmp = ui->treeWidget->topLevelItem(i+1)->childCount();
+//		for (int j = 0;j <tmp;j++)
+//		{
+//			sort.replace(j*3+i,1,QString::number(i+1)[0]);
+//		}
+
+//	}
+//	sort.remove("0");
+//	return sort;
+
+//}
+
+void ModbusFrm::groupucharsort()
 {
-	modbusItemData itemdata = ui->treeWidget->topLevelItem(0)->data(0,Qt::UserRole+1).value<modbusItemData>();
-	int groupnum = itemdata.groupnum;
-	QString sort = QString("%1").arg(QString::number(0),groupnum*3,QLatin1Char('0'));
+	memset(groupuchar,0,sizeof (groupuchar));
+	int groupnum = ui->treeWidget->topLevelItem(0)->data(0,Qt::UserRole+1).value<modbusItemData>().groupnum;
 	for (int i =0;i <3;i++)
 	{
 		int tmp = ui->treeWidget->topLevelItem(i+1)->childCount();
+		int value = 0;
 		for (int j = 0;j <tmp;j++)
 		{
-			sort.replace(j*3+i,1,QString::number(i+1)[0]);
+			for (int k =0;k <j*3+i;k++)
+			{
+				value = groupuchar[k]>value ? groupuchar[k]:value;
+			}
+			groupuchar[j*3+i] =value+1;
+			for (int k =j*3+i+1;k<groupnum*3;k++)
+			{
+				if(groupuchar[k]>0)
+				{
+					groupuchar[k]++;
+				}
+			}
 		}
-
 	}
-	sort.remove("0");
-	return sort;
+//	for (int i = 0;i<groupnum*3;i += 3) {
+//		qDebug() << groupuchar[i] << groupuchar[i+1]<<groupuchar[i+2];
+//	}
 
 }
 
@@ -396,13 +426,13 @@ void ModbusFrm::on_PBsave_clicked()
 		itemdata.textlst = mStrToList(ui->TEyks->toPlainText().trimmed());
 		if(itemdata.textlst.isEmpty())
 		{
-			return;
+			break;
 		}
 		if(curItem->childCount() > 0)
 		{
 			itemdata.textlst.clear();
 			QMessageBox::warning(this,tr("警告对话框"),tr("遥控组下的遥控点先删除    "));
-			return;
+			break;
 		}
 		for (int i = 0;i < itemdata.textlst.length();i++)
 		{
@@ -421,13 +451,13 @@ void ModbusFrm::on_PBsave_clicked()
 		itemdata.textlst = mStrToList(ui->TEyts->toPlainText().trimmed());
 		if(itemdata.textlst.isEmpty())
 		{
-			return;
+			break;
 		}
 		if(curItem->childCount() > 0)
 		{
 			itemdata.textlst.clear();
 			QMessageBox::warning(this,tr("警告对话框"),tr("遥调组下的遥调点先删除    "));
-			return;
+			break;
 		}
 		for (int i = 0;i < itemdata.textlst.length();i++)
 		{
@@ -623,7 +653,8 @@ void ModbusFrm::writeXml()
 	{
 		return;
 	}
-	QString sort = groupsort();
+	groupucharsort();
+//	QString sort = groupsort();
 	QDomDocument doc;
 	QDomProcessingInstruction instruction;
 	instruction = doc.createProcessingInstruction("xml","version=\"1.0\" encoding=\"utf-8\"");
@@ -659,7 +690,7 @@ void ModbusFrm::writeXml()
 				modbusItemData childitemdata = childitem->data(0,Qt::UserRole+1).value<modbusItemData>();
 				group = doc.createElement("遥测");
 				root.appendChild(group);
-				index = sort.indexOf('1',index)+1;
+				index = groupuchar[i*3];//sort.indexOf('1',index)+1;
 				group.setAttribute("index",index);
 				setting = doc.createElement("选项");
 				group.appendChild(setting);
@@ -683,7 +714,7 @@ void ModbusFrm::writeXml()
 				modbusItemData childitemdata = childitem->data(0,Qt::UserRole+1).value<modbusItemData>();
 				group = doc.createElement("遥信");
 				root.appendChild(group);
-				index = sort.indexOf('2',index)+1;
+				index = groupuchar[i*3+1];//sort.indexOf('2',index)+1;
 				group.setAttribute("index",index);
 				setting = doc.createElement("选项");
 				group.appendChild(setting);
@@ -707,7 +738,7 @@ void ModbusFrm::writeXml()
 				modbusItemData childitemdata = childitem->data(0,Qt::UserRole+1).value<modbusItemData>();
 				group = doc.createElement("遥脉");
 				root.appendChild(group);
-				index = sort.indexOf('3',index)+1;
+				index = groupuchar[i*3+2];//sort.indexOf('3',index)+1;
 				group.setAttribute("index",index);
 				setting = doc.createElement("选项");
 				group.appendChild(setting);

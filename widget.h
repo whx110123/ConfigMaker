@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "globalfunc.h"
+#include <QtXml>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -19,9 +20,13 @@ public:
 	QString filetxtdir;								//txt文件路径
 	QString filecfgdir;								//cfg文件路径
 	QString filename;								//文件名
-	QString createmodbustxt(QString filename);
+	QString createmodbustxt();
+	QString createmodbuscfg();
+	QString createxml();
 	QString createtxt();							//编写txt文件内容
 	QString createcfg();							//编写cfg文件内容
+//	void findwithtype(QDomElement &root, QDomElement &elem,QString type,int index);
+	void findelement(QDomElement &root, QDomElement &elem,QString tagname = QString(),QString attr= QString(),QString attrvalue= QString());
 private slots:
 	void on_PB_selectfile_clicked();				//选择点表文件
 	void on_PB_out_clicked();						//导出点表
