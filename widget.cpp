@@ -14,6 +14,7 @@ Widget::Widget(QWidget *parent)
 	, ui(new Ui::Widget)
 {
 	ui->setupUi(this);
+	diaintro = new DialogIntroduction(this);
 
 }
 
@@ -507,4 +508,9 @@ void Widget::on_PB_out_clicked()
 		tmpDir.remove(tmpDir.split("/").last());
 		QDesktopServices::openUrl(QUrl::fromLocalFile(tmpDir));
 	}
+}
+
+void Widget::on_pbintro_clicked()
+{
+	diaintro->exec();
 }

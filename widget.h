@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "globalfunc.h"
 #include <QtXml>
+#include "dialogintroduction.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -31,7 +32,10 @@ private slots:
 	void on_PB_selectfile_clicked();				//选择点表文件
 	void on_PB_out_clicked();						//导出点表
 
+	void on_pbintro_clicked();
+
 private:
 	Ui::Widget *ui;
+	DialogIntroduction *diaintro;
 };
 #endif // WIDGET_H

@@ -7,7 +7,7 @@ IDI_ICON1 ICON DISCARDABLE "main.ico"
 #endif
 
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION 1,0,0,0
+	FILEVERSION 1,0,1,0
     FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
     FILEFLAGS VS_FF_DEBUG
@@ -24,7 +24,7 @@ VS_VERSION_INFO VERSIONINFO
             BEGIN
 	            VALUE "FileDescription", "点表制作工具"
                 VALUE "ProductName", "点表制作工具"
-                VALUE "ProductVersion", "V1.00"
+				VALUE "ProductVersion", "V1.01"
                 VALUE "LegalCopyright", "Copyright(C) 江苏金智科技股份有限公司"
                 VALUE "OriginalFilename", "ConfigMaker.exe"
                 VALUE "CompanyName", "江苏金智科技股份有限公司"

@@ -37,17 +37,17 @@ void ModbusFrm::initconfig()
 	connect(ui->act3, SIGNAL(triggered()),	this,SLOT(renameItem()));
 
 	QTreeWidgetItem *tmp;
-	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "00.基本配置" , BASE);
+	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "0.基本配置" , BASE);
 	tmp->setData(0,Qt::UserRole+1,QVariant::fromValue(defaultdata));
-	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "01.遥测" , YC);
+	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "1.遥测" , YC);
 	tmp->setData(0,Qt::UserRole+1,QVariant::fromValue(defaultdata));
-	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "02.遥信" , YX);
+	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "2.遥信" , YX);
 	tmp->setData(0,Qt::UserRole+1,QVariant::fromValue(defaultdata));
-	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "03.遥脉" , YM);
+	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "3.遥脉" , YM);
 	tmp->setData(0,Qt::UserRole+1,QVariant::fromValue(defaultdata));
-	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "04.遥控" , YK);
+	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "4.遥控" , YK);
 	tmp->setData(0,Qt::UserRole+1,QVariant::fromValue(defaultdata));
-	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "05.遥调" , YT);
+	tmp = new QTreeWidgetItem(ui->treeWidget,QStringList() << "5.遥调" , YT);
 	tmp->setData(0,Qt::UserRole+1,QVariant::fromValue(defaultdata));
 
 }
@@ -109,7 +109,7 @@ QString ModbusFrm::checkerror()
 				modbusItemData childitemdata = childitem->data(0,Qt::UserRole+1).value<modbusItemData>();
 				if(childitemdata.textlst.isEmpty())
 				{
-					text.append("出错，"+item->text(0)+childitem->text(0)+"描述为空");
+					text.append("出错，"+item->text(0)+" "+childitem->text(0)+" 描述为空");
 					return text;
 				}
 			}
@@ -312,17 +312,17 @@ void ModbusFrm::saveItem(QTreeWidgetItem *item)
 		ui->Labelymnum->setText(QString::number(itemdata.textlst.length()));
 		break;
 	case YKITEM:
-		itemdata.textlst = mStrToList(ui->TEyk->toPlainText().trimmed(),1);
+		itemdata.textlst = mStrToList(ui->LEyk->text().trimmed(),1);
 		itemdata.ykcloseaddrsel = ui->LEyk1->text().toUShort(0,ui->CByk1->isChecked()?16:10);
 		itemdata.ykcloseaddr = ui->LEyk2->text().toUShort(0,ui->CByk2->isChecked()?16:10);
 		itemdata.ykopenaddrsel = ui->LEyk3->text().toUShort(0,ui->CByk3->isChecked()?16:10);
 		itemdata.ykopenaddr = ui->LEyk4->text().toUShort(0,ui->CByk4->isChecked()?16:10);
-		ui->Labelyknum->setText(QString::number(itemdata.textlst.length()));
+//		ui->Labelyknum->setText(QString::number(itemdata.textlst.length()));
 		break;
 	case YTITEM:
-		itemdata.textlst = mStrToList(ui->TEyt->toPlainText().trimmed(),1);
+		itemdata.textlst = mStrToList(ui->LEyt->text().trimmed(),1);
 		itemdata.ytaddr = ui->LEyt1->text().toUShort(0,ui->CByt1->isChecked()?16:10);
-		ui->Labelytnum->setText(QString::number(itemdata.textlst.length()));
+//		ui->Labelytnum->setText(QString::number(itemdata.textlst.length()));
 		break;
 	case BASE:
 		itemdata.ymseq = ui->LE6->text().toUShort(0,ui->CB6->isChecked()?16:10);
@@ -404,6 +404,7 @@ void ModbusFrm::refreshItem(QTreeWidgetItem *item)
 	{
 		text.append(tmp + "\n");
 	}
+	text = text.trimmed();
 	switch (item->type())
 	{
 	case YCITEM:
@@ -437,9 +438,9 @@ void ModbusFrm::refreshItem(QTreeWidgetItem *item)
 		break;
 	case YKITEM:
 		ui->stackconfig->setCurrentIndex(4);
-		ui->TEyk->setPlainText(text);
+		ui->LEyk->setText(text);
 		ui->Labelyk->setText(item->text(0));
-		ui->Labelyknum->setText(QString::number(itemdata.textlst.length()));
+//		ui->Labelyknum->setText(QString::number(itemdata.textlst.length()));
 		ui->LEyk1->setText(QString::number(itemdata.ykcloseaddrsel,ui->CByk1->isChecked()?16:10));
 		ui->LEyk2->setText(QString::number(itemdata.ykcloseaddr,ui->CByk2->isChecked()?16:10));
 		ui->LEyk3->setText(QString::number(itemdata.ykopenaddrsel,ui->CByk3->isChecked()?16:10));
@@ -447,9 +448,9 @@ void ModbusFrm::refreshItem(QTreeWidgetItem *item)
 		break;
 	case YTITEM:
 		ui->stackconfig->setCurrentIndex(5);
-		ui->TEyt->setPlainText(text);
+		ui->LEyt->setText(text);
 		ui->Labelyt->setText(item->text(0));
-		ui->Labelytnum->setText(QString::number(itemdata.textlst.length()));
+//		ui->Labelytnum->setText(QString::number(itemdata.textlst.length()));
 		ui->LEyt1->setText(QString::number(itemdata.ytaddr,ui->CByt1->isChecked()?16:10));
 		break;
 	case BASE:
@@ -824,3 +825,15 @@ void ModbusFrm::writeXml()
 
 
 
+
+void ModbusFrm::on_PBykadd_clicked()
+{
+	QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
+	saveItem(curItem);
+}
+
+void ModbusFrm::on_PBytadd_clicked()
+{
+	QTreeWidgetItem* curItem=ui->treeWidget->currentItem();  //获取当前被点击的节点
+	saveItem(curItem);
+}

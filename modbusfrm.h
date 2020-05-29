@@ -122,6 +122,10 @@ private slots:
 	void on_CByk4_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByt1_stateChanged(int arg1);			//10进制与16进制转换
 
+	void on_PBykadd_clicked();
+
+	void on_PBytadd_clicked();
+
 protected:
 //	virtual void keyPressEvent(QKeyEvent *event);	//捕获部分键盘信号
 public:
