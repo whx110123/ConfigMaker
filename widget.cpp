@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QDebug>
+#include <QDesktopServices>
 
 
 Widget::Widget(QWidget *parent)
@@ -451,8 +452,21 @@ void Widget::on_PB_out_clicked()
 {
 	QString fileDir = ui->LE_filedir->text();
 	if(fileDir.isEmpty())
+	{		
+		int ret = QMessageBox::question(this,tr("对话框"),tr("路径为空,是否先选择文件	"),
+										QMessageBox::Yes | QMessageBox::Default,
+										QMessageBox::No | QMessageBox::Escape);
+		if(ret == QMessageBox::Yes)
+		{
+			on_PB_selectfile_clicked();
+		}
+		else
+		{
+			return;
+		}
+	}
+	if(fileDir.isEmpty())
 	{
-		QMessageBox::warning(this,tr("警告对话框"),tr("请先选择文件   "));
 		return;
 	}
 	QString err =createxml();
@@ -483,5 +497,14 @@ void Widget::on_PB_out_clicked()
 	outcfg << createcfg() ;
 	filecfg.close();
 
-	QMessageBox::information(this,tr("提示对话框"),tr("已完成       "));
+//	QMessageBox::information(this,tr("提示对话框"),tr("已完成       "));
+	int ret = QMessageBox::question(this,tr("对话框"),tr("已完成,是否打开文件目录	"),
+									QMessageBox::Yes | QMessageBox::Default,
+									QMessageBox::No | QMessageBox::Escape);
+	if(ret == QMessageBox::Yes)
+	{
+		QString tmpDir = fileDir;
+		tmpDir.remove(tmpDir.split("/").last());
+		QDesktopServices::openUrl(QUrl::fromLocalFile(tmpDir));
+	}
 }

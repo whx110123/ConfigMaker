@@ -91,8 +91,11 @@ private slots:
 	void createItem();								//创建条目
 	void deleteItem();								//删除条目
 	void renameItem();								//重命名条目
-	void on_treeWidget_itemSelectionChanged();		//选择条目改变时，显示对应内容
-	void on_PBsave_clicked();						//保存
+//	void on_treeWidget_itemSelectionChanged();		//选择条目改变时，显示对应内容
+//	void on_PBsave_clicked();						//保存
+	void saveItem(QTreeWidgetItem *item);
+	void refreshItem(QTreeWidgetItem *item);
+	void on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
 	void on_CB1_stateChanged(int arg1);				//10进制与16进制转换
 	void on_CB2_stateChanged(int arg1);				//10进制与16进制转换
@@ -102,31 +105,25 @@ private slots:
 	void on_CB6_stateChanged(int arg1);				//10进制与16进制转换
 	void on_CB7_stateChanged(int arg1);				//10进制与16进制转换
 	void on_CB8_stateChanged(int arg1);				//10进制与16进制转换
-
 	void on_CByc1_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByc2_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByc3_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByc4_stateChanged(int arg1);			//10进制与16进制转换
-
 	void on_CByx1_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByx2_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByx3_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByx4_stateChanged(int arg1);			//10进制与16进制转换
-
 	void on_CBym1_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CBym2_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CBym3_stateChanged(int arg1);			//10进制与16进制转换
-
 	void on_CByk1_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByk2_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByk3_stateChanged(int arg1);			//10进制与16进制转换
 	void on_CByk4_stateChanged(int arg1);			//10进制与16进制转换
-
 	void on_CByt1_stateChanged(int arg1);			//10进制与16进制转换
 
-
 protected:
-	virtual void keyPressEvent(QKeyEvent *event);	//捕获部分键盘信号
+//	virtual void keyPressEvent(QKeyEvent *event);	//捕获部分键盘信号
 public:
 	void writeXml();
 	void readXml();
