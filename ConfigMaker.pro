@@ -1,7 +1,7 @@
 QT       += core gui
 QT		+= xml
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+msvc:QMAKE_CXXFLAGS += /utf-8
 CONFIG += c++11
 TARGET              = ConfigMaker
 TEMPLATE            = app
